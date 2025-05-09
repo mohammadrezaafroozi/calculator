@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>calculator</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <input class="screen" disabled ></input>
+    <div class="keys">
+    <button class="operator" value="+">+</button>
+    <button class="operator" value="-">-</button>
+    <button class="operator" value="*">&#215;</button>
+    <button class="operator" value="/">&#247;</button>
+    <button value="7">7</button>
+    <button value="8">8</button>
+    <button value="9">9</button>
+
+    <button value="4">4</button>
+    <button value="5">5</button>
+    <button value="6">6</button>
+
+    <button value="1">1</button>
+    <button value="2">2</button>
+    <button value="3">3</button>
+
+    <button value="0">0</button>
+    <button class="decimal" value=".">.</button>
+    <button class="ac" value="all-clear">AC</button>
+    <button class="equal-sign operator" value="=">=</button>
+    </div>
+</div>
+<figure class="footer">
+    <a href="https://github.com/mohammadrezaafroozi" target="_blank">
+        <i class="bi bi-github"></i>
+    </a>
+    <a href="https://www.linkedin.com/in/mohammad-reza-afroozi-65886b349/" target="_blank">
+        <i class=" bi bi-linkedin"></i>
+    </a>
+    <a href="https://www.instagram.com/afroozi_dev?igsh=MWNvODk2dGwwY29o" target="_blank">
+        <i class=" bi bi-instagram"></i>
+    </a>
+    <img src="./img/myphoto.jpg" alt="">
+    <figcaption>Mohammad Afroozi</figcaption>
+</figure>
+
+<script>
+    const calculator = {
+    displayValue:'0',
+    firstOperand:null,
+    waitingForSecondOperand: false,
+    operator:null,
+};
+///displaey select///
+const updateDisplay= ()=>{
+    const display = document.querySelector('.screen')
+    display.value= calculator.displayValue
+};
+updateDisplay();
+
+/// keys select///
+const keys= document.querySelector('.keys')
+keys.addEventListener('click', (e)=>{
+    const {target} = e
+    if(!target.matches('button')){
+        return;
+    }
+    console.log('button clicked', target.value)
+    if( target.classList.contains('operator')){
+        myOperator(target.value)
+        updateDisplay();
+        return;
+    }
+    if(target.classList.contains('decimal')){
+        inputDecimal(target.value)
+        updateDisplay()
+        return;
+    }
+    if (target.classList.contains('ac')) {
+        resetCalculator();
+        updateDisplay(); 
+        return;
+    }
+    inputDigit(target.value)
+    updateDisplay()
+})
+
+////input numbers///
+const inputDigit = (digit)=>{
+    const{displayValue, waitingForSecondOperand}=calculator;
+    if(waitingForSecondOperand===true){
+      calculator.displayValue=digit;
+      calculator.waitingForSecondOperand= false
+    }else{
+        calculator.displayValue=displayValue==='0'?digit: displayValue+digit;
+    }
+}
+
+
+//////input decimal///
+const inputDecimal = (dot)=>{
+    if(calculator.waitingForSecondOperand===true){
+        calculator.displayValue='0.';
+        calculator.waitingForSecondOperand=false;
+        return;
+    }
+    if(!calculator.displayValue.includes(dot)){
+        calculator.displayValue+= dot;
+    }
+}
+
+/////operators////
+
+const myOperator= (nextoperator)=>{
+    const{ firstOperand, displayValue, operator}= calculator;
+    const inputValue= parseFloat(displayValue)
+    console.log('before', calculator)
+    if(operator && calculator.waitingForSecondOperand){
+        calculator.operator = nextoperator;
+        return;
+    }
+    if(firstOperand == null && !isNaN(inputValue)){
+        calculator.firstOperand=inputValue
+    }else if(operator){
+        const result = calculate( firstOperand, inputValue, operator)
+      calculator.displayValue=`${parseFloat(result.toFixed(7))}`
+      calculator.firstOperand=result
+    }
+    calculator.waitingForSecondOperand= true;
+    calculator.operator=nextoperator
+    console.log('After:', calculator);
+    // calculator.displayValue = nextoperator;
+}
+/////calculating////
+const calculate= (firstOperand ,secondOperand, operator)=>{
+    console.log('Calculating:', firstOperand, operator, secondOperand);
+    if(operator==='+'){
+        return firstOperand + secondOperand
+    }
+    else if(operator==='-'){
+        return firstOperand - secondOperand
+    }
+    else if(operator==='*'){
+        return firstOperand * secondOperand
+    }
+    else if(operator==='/'){
+        return firstOperand / secondOperand
+    }
+    return secondOperand;
+}
+////reset calc/////
+const resetCalculator = () => {
+    calculator.displayValue = '0';
+    calculator.firstOperand = null;
+    calculator.waitingForSecondOperand = false;
+    calculator.operator = null;
+};
+</script>
+</body>
+
+</html>
